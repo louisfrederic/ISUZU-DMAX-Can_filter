@@ -1,0 +1,17 @@
+  /**
+  ******************************************************************************
+  * 
+  *		This is a program to correct the displayed speed of the speedometer. 
+  *		I had to adjust my speedometer because I installed bigger tires.
+  *
+  *		The µC makes a man in the middle attack and recalculates the values in
+  *		the CAN message. The correction factor is stored in the "cor_val" variable.
+  *		To display 6% more on the speedo -> cor_val = 1.06
+  *		To display 7% less on the speedo -> cor_val = 0.93
+  *
+  * 	 _______			  ________				_________
+  * 	| SPEDO | -----------| STM32  |------------| rest of the bus
+  * 	|_______|	can2	 |________|     can1   |_________
+  *                      
+  *
+  ******************************************************************************

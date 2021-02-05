@@ -12,4 +12,6 @@ and this is the schematic
 
 ![alt text](https://github.com/louisfrederic/Can_filter/blob/main/can_bus_filter_schematics.png?raw=true)
 
+For flashing the device with a St-Link you have to go wit NRST on pin7 or solder pin7 to "Boot" an cut the trace from "boot"
+
 That are not my pictures, I found them on the internet...

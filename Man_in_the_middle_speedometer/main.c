@@ -9,9 +9,9 @@
   * 	Every on can1 recieved frame get resend by can2, exeped one ID which gets 
   * 	blocked. After 10sec the next ID gets blocked.
   *
-  * 	 _______			  ________				_________
+  * 	 _______	      ________		    _________
   * 	| SPEDO | -----------| STM32  |------------| rest of the bus
-  * 	|_______|	can2	 |________|     can1   |_________
+  * 	|_______|   can2     |________|     can1   |_________
   *                      
   *
   ******************************************************************************

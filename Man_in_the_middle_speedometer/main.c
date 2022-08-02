@@ -8,10 +8,15 @@
   *		This is a programm for evaluating CAN-IDs with a man in the middle attack
   * 	Every on can1 recieved frame get resend by can2, exeped one ID which gets 
   * 	blocked. After 10sec the next ID gets blocked.
+  *	This is a really dirty way to find out your Can Ids, but a fast one. The Speedo is 
+  *	only a instrument wich shows you some information, so seperating the speedo from the 
+  *	bus shut not effect the rest of the car.
+  *	After that you have to clear all the fault codes!
+  *	!!!No guarantee for things that happen with your car if you use my code!!!
   *
   * 	 _______	      ________		    _________
-  * 	| SPEDO | -----------| STM32  |------------| rest of the bus
-  * 	|_______|   can2     |________|     can1   |_________
+  * 	| SPEEDO | -----------| STM32  |------------| rest of the bus
+  * 	|_______ |   can2     |________|     can1   |_________
   *                      
   *
   ******************************************************************************

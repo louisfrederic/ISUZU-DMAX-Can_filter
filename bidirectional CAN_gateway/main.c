@@ -28,10 +28,14 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+CAN_HandleTypeDef hcan1;
+CAN_HandleTypeDef hcan2;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -40,8 +44,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-CAN_HandleTypeDef hcan1;
-CAN_HandleTypeDef hcan2;
+
 
 /* USER CODE BEGIN PV */
 CAN_TxHeaderTypeDef   TxHeader1;
@@ -56,7 +59,6 @@ uint8_t               TxData2[8];
 uint8_t               RxData2[8];
 uint32_t              TxMailbox2;
 
-float				cor_val = 1.06;
 
 /* USER CODE END PV */
 
@@ -319,29 +321,56 @@ static void MX_GPIO_Init(void)
   */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
 {
-  /* Get RX message */
+  /* Get RX message FROM car TO speedo*/
   if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &RxHeader1, RxData1) != HAL_OK)
   {
     /* Reception Error */
     Error_Handler();
   }
 
+
+
   /* Block ID for speed an manipulate data  */
   if (RxHeader1.StdId == 0x3e9)
   {
-    //Data manipulation +6%
-	  if(RxData1[1] <= 0xEF){
-		  TxData2[0]=RxData1[0];
-		  TxData2[1] = RxData1[1]*cor_val;
-	  }else{
-		  TxData2[0] = RxData1[0] + 0x01;
-		  TxData2[1] = RxData1[1]*cor_val - 0xFF;
+    /*------------Data manipulation----------------
+	#scale
+		if(kmh > 20) => 4.2
+			- 4.2 km/h
+		if(3 < kmh > 20) => 3
+			- 1.5 km/h	
+		if(kmh < 3) => 1.5
+			none
+		
+
+		HEX
+		00 | 00
+		...			8 Bit -> 256/scale =>
+		00 | FF
+		01 | 00
+		01 | 01
+	--------------------------------------------------*/
+	  
+	  
+	  if(RxData1[0] <= 0x03){								//don't manipulate
+		  TxData2[0] = RxData1[0];							//
+		  TxData2[1] = RxData1[1];
 	  }
-	  int z;
-	  for (z=2;z<RxHeader1.DLC;z++)
-	  	     {
-	  		  TxData2[z] = 0x00;
-	  	     }
+
+	  if(RxData1[0] < 0x07 && RxData1[0] > 0x03){			// manipulate +1/2*scale between 3 and 7
+		  if(RxData1[1] < 0x80){							// check if we can add 1/2*scale without going over 255
+		  		TxData2[0] = RxData1[0];						// don't change the first bit
+		  		TxData2[1] = RxData1[1] + 0x7f;				// + 1/2*scale
+		  }else{											// RxData1[1] + 127 = > 256
+		  		TxData2[0] = RxData1[0] + 0x01;				// +1
+		  		TxData2[1] = RxData1[1] - 0x80;				// RxData[1] - 127 = difference for bit overflow
+		  }
+	  }
+
+	  if(RxData1[0] >= 0x07){								// ca. 20 km/h
+		  TxData2[0] = RxData1[0] + 0x01;					// CAN1 -> +4,2km/h -> speedo
+		  TxData2[1] = RxData1[1];							//
+	  }
 
   }else{
 	  //redirect every Frame from Can1 to Can2
@@ -350,7 +379,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
 	     {
 		  TxData2[i] = RxData1[i];
 	     }
+
+
   }
+
   TxHeader2.StdId = RxHeader1.StdId;
   TxHeader2.ExtId = RxHeader1.ExtId;
   TxHeader2.RTR = RxHeader1.RTR;
@@ -376,7 +408,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
   */
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2)
 {
-  /* Get RX message */
+  /* Get RX message FROM speedo BACK to car */
   if (HAL_CAN_GetRxMessage(hcan2, CAN_RX_FIFO1, &RxHeader2, RxData2) != HAL_OK)
   {
     /* Reception Error */
@@ -439,3 +471,4 @@ void assert_failed(uint8_t *file, uint32_t line)
 #endif /* USE_FULL_ASSERT */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

@@ -352,24 +352,24 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
 	--------------------------------------------------*/
 	  
 	  
-	  if(RxData1[0] <= 0x03){								//don't manipulate
-		  TxData2[0] = RxData1[0];							//
+	  if(RxData1[0] <= 0x03){							//don't manipulate
+		  TxData2[0] = RxData1[0];						//
 		  TxData2[1] = RxData1[1];
 	  }
 
-	  if(RxData1[0] < 0x07 && RxData1[0] > 0x03){			// manipulate +1/2*scale between 3 and 7
-		  if(RxData1[1] < 0x80){							// check if we can add 1/2*scale without going over 255
-		  		TxData2[0] = RxData1[0];						// don't change the first bit
+	  if(RxData1[0] < 0x05 && RxData1[0] > 0x03){					// manipulate +1/2*scale between 03 00 and 05 00
+		  if(RxData1[1] < 0x80){						// check if we can add 1/2*scale without going over 255
+		  		TxData2[0] = RxData1[0];				// don't change the first bit
 		  		TxData2[1] = RxData1[1] + 0x7f;				// + 1/2*scale
-		  }else{											// RxData1[1] + 127 = > 256
+		  }else{								// RxData1[1] + 127 = > 256
 		  		TxData2[0] = RxData1[0] + 0x01;				// +1
 		  		TxData2[1] = RxData1[1] - 0x80;				// RxData[1] - 127 = difference for bit overflow
 		  }
 	  }
 
-	  if(RxData1[0] >= 0x07){								// ca. 20 km/h
+	  if(RxData1[0] >= 0x05){							// ca. 20 km/h
 		  TxData2[0] = RxData1[0] + 0x01;					// CAN1 -> +4,2km/h -> speedo
-		  TxData2[1] = RxData1[1];							//
+		  TxData2[1] = RxData1[1];						//
 	  }
 
   }else{

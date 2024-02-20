@@ -9,7 +9,7 @@
   *		To display 6% more on the speedo -> cor_val = 1.06
   *		To display 7% less on the speedo -> cor_val = 0.93
   *
-  * 	 _______			        ________				      _________
+  * 	 _______			   ________				      _________
   * 	| SPEDO | -----------| STM32  |------------| rest of the bus
   * 	|_______|	    can2	 |________|     can1   |_________
   *                      

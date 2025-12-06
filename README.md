@@ -1,6 +1,21 @@
+# Why?
+if you drive a offroad vehicle and would like do mount bigger tires, there are some limitations to be street leagal.
+In Germany for example, your car speedo have to show you more then the actual speed. So if you drive 100 km/h in real, the speedometer shows you smoething around 103 km/h.
+If you go to the technical inspection they will check the acurracy of your speedo against a GPS speedometer.
+
+There are some devices available to adjust the speedometer but they are arount 500€...
+
+# basic principal
+The Speedometer gets it's signal over CAN bus. With a physical MITM attack on the bus we can control the speedometer.
+  	 _______	           _____________		      _________
+  	| SPEEDO | -----------| µController |------------| rest of the bus
+ 	|_______ |   can2     |_____________|     can1   |_________
+
+The same method is used to manipulate the mileage on older used cars. With a little research, it's easy to find the right hardware.
+
 # STM32 CAN BUS Gateway
 
-This is a cheap bidirektional Can Bus Gateway based on a chinese PCB wich you can find on Ebay or aliexpres if you search for 
+This chinese PCB can be found on Ebay or aliexpres if you search for 
 
   "18 in 1 Can Bus Filter"
 
@@ -16,7 +31,7 @@ For flashing the device with a St-Link you have to go wit NRST on pin7 or solder
 
 That are not my pictures, I found them on the internet...
 
-## Hex to Speed
+## short wrap up
 
 To extract a CAN signal, you 'carve out' the relevant bits, take the decimal value and perform a linear scaling:
 ```math
